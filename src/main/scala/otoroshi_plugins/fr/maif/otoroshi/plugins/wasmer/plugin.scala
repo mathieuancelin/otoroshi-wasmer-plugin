@@ -98,19 +98,20 @@ class WasmerResponse extends RequestTransformer {
             .flatMapConcat(s => s)
           bodySource.runFold(ByteString.empty)(_ ++ _).flatMap { bodyRaw =>
             Future {
-              Wasmer.script(wasm.asByteBuffer.array(), pages) { wasmerEnv =>
-                val req = ctx.otoroshiRequest
-                val body = if (bodyRaw.isEmpty) JsNull else JsString(bodyRaw.utf8String)
-                val headersIn: Map[String, String] = req.headers
-                val subject = ByteString(Json.stringify(Json.obj(
-                  "query" -> req.uri.query().toMap,
-                  "method" -> req.method,
-                  "headers" -> headersIn,
-                  "body" -> body,
-                  "path" -> req.uri.path.toString(),
-                )))
+              val body = if (bodyRaw.isEmpty) JsNull else JsString(bodyRaw.utf8String)
+              val req = ctx.otoroshiRequest
+              val headersIn: Map[String, String] = req.headers
+              val context = ByteString(Json.stringify(Json.obj(
+                "query" -> req.uri.query().toMap,
+                "method" -> req.method,
+                "headers" -> headersIn,
+                "body" -> body,
+                "path" -> req.uri.path.toString(),
+              )))
+              logger.debug(s"context: ${context.utf8String}")
+              Wasmer.script(wasm.toByteBuffer.array(), pages) { wasmerEnv =>
                 Try {
-                  val input = wasmerEnv.input_raw(subject.utf8String.getBytes)
+                  val input = wasmerEnv.input_raw(context.utf8String.getBytes)
                   wasmerEnv.execFunction("handle_http_request", Seq(input))
                 } match {
                   case Failure(ex) => {

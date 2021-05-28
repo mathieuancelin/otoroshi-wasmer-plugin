@@ -17,6 +17,7 @@ wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-
 # or wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-linux-0.3.0.jar
 # or wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-windows-0.3.0.jar
 java -cp "./wasmer-jni-amd64-darwin-0.3.0.jar:./target/scala-2.12/otorshi-wasmer-plugin_2.12-1.0.0-dev.jar:./otoroshi.jar" -Dapp.adminLogin=admin -Dapp.adminPassword=password play.core.server.ProdServerStart
+
 ```
 
 then log into otoroshi (admin/password), creates a new service exposed on `http://wasm.oto.tools:8080/` and add the plugin in the transformer section and configure it like
@@ -28,6 +29,33 @@ then log into otoroshi (admin/password), creates a new service exposed on `http:
     "wasm": "https://github.com/mathieuancelin/otoroshi-wasmer-plugin/raw/master/hello.wasm"
   }
 }
+```
+
+```sh
+curl -X POST -H 'Content-Type: application/json' \
+  http://otoroshi-api.oto.tools:8080/api/services/_template \
+  -u admin-api-apikey-id:admin-api-apikey-secret \
+  -d '{
+  "id": "wasm-test",
+  "name": "wasm-test",
+  "env": "prod",
+  "domain": "oto.tools",
+  "subdomain": "wasm",
+  "targets": [{ "host": "lolcatho.st:8080", "scheme": "http" }],
+  "root": "/",
+  "publicPatterns": [
+    "/.*"
+  ],
+  "enforceSecureCommunication": false,
+  "sendStateChallenge": false,
+  "transformerRefs": ["cp:otoroshi_plugins.fr.maif.otoroshi.plugins.wasmer.WasmerResponse"],
+  "transformerConfig": {
+    "WasmerResponse": {
+      "pages": 1,
+      "wasm": "https://github.com/mathieuancelin/otoroshi-wasmer-plugin/raw/master/hello.wasm"
+    }
+  }
+}'
 ```
 
 ## try
