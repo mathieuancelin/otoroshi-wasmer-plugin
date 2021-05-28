@@ -11,6 +11,8 @@ sbt package
 
 ## run otoroshi with the plugin
 
+in the following commands, download the right wasmer runtime and use the right jar according to your operating system
+
 ```sh
 wget https://github.com/MAIF/otoroshi/releases/download/v1.5.0-alpha.14/otoroshi.jar
 wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-darwin-0.3.0.jar
