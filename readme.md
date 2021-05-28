@@ -19,15 +19,28 @@ wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-
 java -cp "./wasmer-jni-amd64-darwin-0.3.0.jar:./target/scala-2.12/otorshi-wasmer-plugin_2.12-1.0.0-dev.jar:./otoroshi.jar" play.core.server.ProdServerStart
 ```
 
-then log into otoroshi, creates a new service and add the plugin in the transformer section and configure it like
+then log into otoroshi, creates a new service exposed on `http://wasm.oto.tools:8080/` and add the plugin in the transformer section and configure it like
 
 ```json
 {
   "WasmerResponse": {
     "pages": 1,
-    "wasm": "https://url.to.your/compiled.wasm.script"
+    "wasm": "https://github.com/mathieuancelin/otoroshi-wasmer-plugin/raw/master/hello.wasm"
   }
 }
+```
+
+## try
+
+```sh
+curl http://wasm.oto.tools:8080/ --include
+
+HTTP/1.1 200 OK
+Date: Fri, 28 May 2021 12:53:55 GMT
+Content-Type: text/html; charset=UTF-8
+Content-Length: 35
+
+<h1>Hello from wasm.oto.tools:8080!</h1>
 ```
 
 ## make your own webassembly plugin
