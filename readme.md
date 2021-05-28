@@ -1,6 +1,7 @@
 # otoroshi-wasmer-plugin
 
-an otoroshi plugin to respond to an http call from a WASM script
+an otoroshi plugin to respond to an http call from a WASM script. 
+very rought, ugly and unstable ;)
 
 and the plugin on a service and configure it like
 
