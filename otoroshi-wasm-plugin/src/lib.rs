@@ -1,52 +1,3 @@
-# otoroshi-wasmer-plugin
-
-an otoroshi plugin to respond to an http call from a WASM script. 
-very rought, ugly, underperformant and unstable ;)
-
-## build the otoroshi plugin
-
-```sh
-sbt package
-```
-
-## run otoroshi with the plugin
-
-```sh
-wget https://github.com/MAIF/otoroshi/releases/download/v1.5.0-alpha.14/otoroshi.jar
-wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-darwin-0.3.0.jar
-# or wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-linux-0.3.0.jar
-# or wget https://github.com/wasmerio/wasmer-java/releases/download/0.3.0/wasmer-jni-amd64-windows-0.3.0.jar
-java -cp "./wasmer-jni-amd64-darwin-0.3.0.jar:./target/scala-2.12/otorshi-wasmer-plugin_2.12-1.0.0-dev.jar:./otoroshi.jar" play.core.server.ProdServerStart
-```
-
-then log into otoroshi, creates a new service and add the plugin in the transformer section and configure it like
-
-```json
-{
-  "WasmerResponse": {
-    "pages": 1,
-    "wasm": "https://url.to.your/compiled.wasm.script"
-  }
-}
-```
-
-## make your own webassembly plugin
-
-```toml
-[package]
-name = "oto-plugin-wasm"
-version = "0.1.0"
-edition = "2018"
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-wasm-bindgen = "0.2"
-json = "0.12.4"
-```
-
-```rust
 use std::ffi::{CStr, CString};
 use std::mem;
 use std::os::raw::{c_char, c_void};
@@ -144,11 +95,3 @@ pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {
         }
     }
 }
-```
-
-build with 
-
-```sh
-cargo install wasm-pack
-wasm-pack build --target web
-```
