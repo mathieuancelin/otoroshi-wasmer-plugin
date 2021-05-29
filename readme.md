@@ -33,6 +33,8 @@ then log into otoroshi (admin/password), creates a new service exposed on `http:
 }
 ```
 
+or use this command
+
 ```sh
 curl -X POST -H 'Content-Type: application/json' \
   http://otoroshi-api.oto.tools:8080/api/services/_template \
@@ -54,6 +56,7 @@ curl -X POST -H 'Content-Type: application/json' \
   "transformerConfig": {
     "WasmerResponse": {
       "pages": 1,
+      "_wasm":"file://./hello.wasm",
       "wasm": "https://github.com/mathieuancelin/otoroshi-wasmer-plugin/raw/master/hello.wasm"
     }
   }

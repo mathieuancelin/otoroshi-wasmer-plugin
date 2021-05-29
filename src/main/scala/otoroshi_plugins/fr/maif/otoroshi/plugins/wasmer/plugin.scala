@@ -10,6 +10,7 @@ import otoroshi.utils.syntax.implicits._
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{Result, Results}
+import java.nio.file.{Files, Path, Paths}
 
 import java.util.concurrent.Executors
 import scala.collection.concurrent.TrieMap
@@ -81,6 +82,17 @@ class WasmerResponse extends RequestTransformer {
           }
         }
       }
+    } else if (wasm.startsWith("file://")) {
+      scriptCache.getIfPresent(wasm) match {
+        case Some(script) => script.future
+        case None => {
+          val body = ByteString(Files.readAllBytes(Paths.get(wasm.replace("file://", ""))))
+          scriptCache.put(wasm, body)
+          body.future
+        }
+      }
+    } else if (wasm.startsWith("base64://")) {
+      ByteString(wasm.replace("base64://", "")).decodeBase64.future
     } else {
       ByteString(wasm).decodeBase64.future
     }
