@@ -4,6 +4,7 @@ use std::os::raw::{c_char, c_void};
 use std::str;
 
 extern crate json;
+extern crate base64;
 
 #[no_mangle]
 pub extern fn allocate(size: usize) -> *mut c_void {
@@ -26,6 +27,21 @@ pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {
     let (c_string, _bytes) = unsafe { 
         let bytes = CStr::from_ptr(ctx_raw).to_bytes();
         let filtered_bytes = &bytes[0..bytes.len() - 0];
+        // match base64::decode(filtered_bytes) {
+        //     Err(why) => {
+        //         let why_str = why.to_string();
+        //         let formatted = format!(
+        //             r#"{{ "err": "err_from_ptr", "err_desc": "{}" }}"#,
+        //             why_str,
+        //         );
+        //         (formatted, bytes)
+        //     },
+        //     Ok(res) => {
+        //         let arr = &res[..];
+        //         let s: &str = str::from_utf8(arr).unwrap();
+        //         (String::from(s), bytes)
+        //     }
+        // }
         match str::from_utf8(filtered_bytes) {
             Err(why) => {
                 let why_str = why.to_string();
