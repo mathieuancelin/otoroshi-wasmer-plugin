@@ -33,7 +33,7 @@ then log into otoroshi (admin/password), creates a new service exposed on `http:
 }
 ```
 
-or use this command
+or just run the following command to create the service without being logged in
 
 ```sh
 curl -X POST -H 'Content-Type: application/json' \
