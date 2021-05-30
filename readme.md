@@ -52,6 +52,7 @@ curl -X POST -H 'Content-Type: application/json' \
   ],
   "enforceSecureCommunication": false,
   "sendStateChallenge": false,
+  "overrideHost": true,
   "transformerRefs": ["cp:otoroshi_plugins.fr.maif.otoroshi.plugins.wasmer.WasmerResponse"],
   "transformerConfig": {
     "WasmerResponse": {
@@ -71,9 +72,9 @@ curl http://wasm.oto.tools:8080/ --include
 HTTP/1.1 200 OK
 Date: Fri, 28 May 2021 12:53:55 GMT
 Content-Type: text/html; charset=UTF-8
-Content-Length: 35
+Content-Length: 37
 
-<h1>Hello from wasm.oto.tools:8080!</h1>
+<h1>Hello from lolcatho.st:8080!</h1>
 ```
 
 ## make your own webassembly plugin
