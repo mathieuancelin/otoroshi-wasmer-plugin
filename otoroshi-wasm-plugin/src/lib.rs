@@ -23,26 +23,10 @@ pub extern fn deallocate(pointer: *mut c_void, capacity: usize) {
 }
 
 #[no_mangle]
-pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {    
+pub extern fn handle_http_request(pointer: *mut u8, length: u32) -> *const u8 {    
     let (c_string, _bytes) = unsafe { 
-        let bytes = CStr::from_ptr(ctx_raw).to_bytes();
-        let filtered_bytes = &bytes[0..bytes.len() - 0];
-        // match base64::decode(filtered_bytes) {
-        //     Err(why) => {
-        //         let why_str = why.to_string();
-        //         let formatted = format!(
-        //             r#"{{ "err": "err_from_ptr", "err_desc": "{}" }}"#,
-        //             why_str,
-        //         );
-        //         (formatted, bytes)
-        //     },
-        //     Ok(res) => {
-        //         let arr = &res[..];
-        //         let s: &str = str::from_utf8(arr).unwrap();
-        //         (String::from(s), bytes)
-        //     }
-        // }
-        match str::from_utf8(filtered_bytes) {
+        let bytes: &mut [u8] = core::slice::from_raw_parts_mut(pointer, length as usize);
+        match str::from_utf8_mut(bytes) {
             Err(why) => {
                 let why_str = why.to_string();
                 let formatted = format!(
@@ -61,7 +45,7 @@ pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {
                 r#"{{ "err": "err_json_parse", "err_desc": "{}" }}"#,
                 why_str,
             );
-            unsafe { CString::from_vec_unchecked(formatted.as_str().as_bytes().to_vec()) }.into_raw()
+            formatted.as_bytes().as_ptr()
         },
         Ok(ctx) => {
             match ctx["err"].as_str() {
@@ -91,8 +75,7 @@ pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {
                             }
                         },
                     };
-                    let response_b = response.to_string().as_bytes().to_vec();
-                    unsafe { CString::from_vec_unchecked(response_b.to_vec()) }.into_raw()
+                    response.to_string().as_bytes().as_ptr()
                 },
                 Some(err) => {
                     let err_desc = ctx["err_desc"].as_str().unwrap_or("--");
@@ -104,8 +87,7 @@ pub extern fn handle_http_request(ctx_raw: *mut c_char) -> *mut c_char {
                             "err_desc": err_desc
                         }
                     };
-                    let response_b = response.to_string().as_bytes().to_vec();
-                    unsafe { CString::from_vec_unchecked(response_b.to_vec()) }.into_raw()
+                    response.to_string().as_bytes().as_ptr()
                 }
             }
         }

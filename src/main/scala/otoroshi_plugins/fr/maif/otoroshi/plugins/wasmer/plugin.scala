@@ -124,7 +124,7 @@ class WasmerResponse extends RequestTransformer {
               Wasmer.script(wasm.toByteBuffer.array(), pages) { wasmerEnv =>
                 Try {
                   val input = wasmerEnv.input_raw(context.toByteBuffer.array())
-                  wasmerEnv.execFunction("handle_http_request", Seq(input))
+                  wasmerEnv.execFunction("handle_http_request", Seq(input, context.size))
                 } match {
                   case Failure(ex) => {
                     logger.error(s"error from wasm", ex)
